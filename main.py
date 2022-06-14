@@ -64,7 +64,7 @@ def main():
         mnemonic_dict = mnemonic.split(' ')
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div/button[1]'))).click()
         slovo = driver.find_element(by=By.XPATH, value='//*[@id="app-container"]/div[3]/form/div/h4').text
-        a = int(slovo.split(' ')[1][1])
+        a = int(slovo.split(' ')[1].slpit('#')[-1])
         driver.find_element(by=By.XPATH, value='//*[@id="app-container"]/div[3]/form/div/input').send_keys(mnemonic_dict[a-1])
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/form/div/button[1]'))).click()
         time.sleep(50)
