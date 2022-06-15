@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from fake_useragent import UserAgent
+from pyuseragents import random as fake_useragent
 import secrets
 import string
 import time
@@ -15,13 +15,12 @@ def random_nickname_generator():
 
 
 def main():
-    user_agent = UserAgent()
     options = webdriver.ChromeOptions()
-    options.add_argument(f"user-agent={user_agent.random}")
+    options.add_argument(f"user-agent={fake_useragent()}")
     options.add_argument("--disable-blink-features")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    options.add_argument('--disable-gpu')
+    # options.add_argument('--disable-gpu')
     options.add_argument('--disable-infobars')
     options.add_argument("--mute-audio")
     options.add_argument('--profile-directory=Default')
@@ -29,13 +28,13 @@ def main():
     options.add_argument('--no-sandbox')
 
     driver = webdriver.Chrome(
-        executable_path="chromedriver/chromedriver.exe",
+        executable_path="chromedriver/chromedriver",
         options=options
     )
 
     near_wallet_url = 'https://wallet.testnet.near.org/create'
-    testnet_url = ''
-    wait = WebDriverWait(driver, 10)
+    testnet_url = 'https://testnet-dex.woo.org/en/trade'
+    wait = WebDriverWait(driver, 20)
 
     try:
         driver.get(url=near_wallet_url)
@@ -64,10 +63,43 @@ def main():
         mnemonic_dict = mnemonic.split(' ')
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div/button[1]'))).click()
         slovo = driver.find_element(by=By.XPATH, value='//*[@id="app-container"]/div[3]/form/div/h4').text
-        a = int(slovo.split(' ')[1].slpit('#')[-1])
+        a = int(slovo.split(' ')[1].split('#')[-1])
         driver.find_element(by=By.XPATH, value='//*[@id="app-container"]/div[3]/form/div/input').send_keys(mnemonic_dict[a-1])
         wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/form/div/button[1]'))).click()
-        time.sleep(50)
+        wait.until(EC.url_to_be(url='https://wallet.testnet.near.org/'))
+        driver.switch_to.new_window('tab')
+        driver.get(url=testnet_url)
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[1]/div/header/div/div[3]/div'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[2]/div[3]/div/div/div[2]/div[2]/div[5]/button/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div/div[4]/button[2]'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div/div[7]/button[2]'))).click()
+        driver.switch_to.window(driver.window_handles[1])
+        time.sleep(30)
+        wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[2]/div[3]/div/div/div[2]/div[2]/div[5]/button/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[1]/div/header/div/button/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div[2]/button[2]'))).click()
+        wait.until(EC.url_contains(url='https://testnet-dex.woo.org/en/account/wallet?deposit=near&transactionHashes='))
+        time.sleep(20)
+        driver.get(url=testnet_url)
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[2]/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[1]/div[2]/div/table/tbody/tr[1]/td[5]/div/button[1]/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div[1]/div[2]/div/div/div/div/div/button'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[2]/div/div[2]/div[3]/button/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div[2]/button[2]'))).click()
+        wait.until(EC.url_contains(url='https://testnet-dex.woo.org/en/account/wallet?deposit=near&transactionHashes='))
+        driver.get('https://testnet-dex.woo.org/en/account/wallet?deposit=near')
+        time.sleep(20)
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[1]/div[2]/div/table/tbody/tr[2]/td[5]/div/button[1]/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div[1]/div[2]/div/div/div/input')))
+        driver.find_element(by=By.XPATH, value='//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div[1]/div[2]/div/div/div/input').send_keys(150)
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="root"]/div/div[3]/div[2]/div[1]/div/div/div/div/div/div/div/div[2]/div[2]/div/div[2]/div[3]/button/span'))).click()
+        wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-container"]/div[3]/div[2]/button[2]'))).click()
+        wait.until(EC.url_contains(url='https://testnet-dex.woo.org/en/account/wallet?deposit=near&transactionHashes='))
+        driver.get('https://testnet-dex.woo.org/en/account/wallet?deposit=near')
+        # wait.until(EC.url_contains(url='https://testnet-dex.woo.org/en/account/wallet?deposit=near&transactionHashes='))
+        # driver.get(url=testnet_url)
+
+        time.sleep(500)
     except Exception as ex:
         print(ex)
     finally:
